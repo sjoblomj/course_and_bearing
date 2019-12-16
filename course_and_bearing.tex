@@ -1,0 +1,252 @@
+% From https://github.com/sjoblomj/course_and_bearing
+%
+% By Johan Sjöblom 2016
+%
+% Licensed under Creative Commons Zero v1.0 Universal, i.e. you may
+% use this document in any way you wish, and you may spread it
+% around freely. Actually, you are encouraged to spread it.
+
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc} % Make sure the document is encoded in UTF8
+\usepackage{fancyhdr}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{bigdelim}
+\usepackage{ifthen}
+\usepackage{wrapfig}
+\usepackage{tikz}
+
+\usetikzlibrary{calc,patterns,angles,quotes,arrows.meta}
+\pagenumbering{gobble} % Remove page numbers (and reset to 1)
+
+\pagestyle{fancy}
+\fancyhf{} % Sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\topskip}{0pt}  % Skip some whitespace at the top
+\setlength{\footskip}{0pt} % Skip some whitespace at the bottom
+\topmargin -20.0pt
+
+
+\newcommand{\useenglish}{true}
+
+
+\ifthenelse{ \equal{\useenglish}{true}}{
+  \newcommand{\textcourse}{Course}
+  \newcommand{\textbearing}{Bearing}
+  \newcommand{\textboatpointing}{The boat points here}
+  \newcommand{\textboatpointingdescr}{To where the boat points}
+  \newcommand{\textboatonchart}{The direction of the boat, to draw in the chart}
+  \newcommand{\texttripdescr}{Describes the trip}
+  \newcommand{\textwind}{Wind}
+  \newcommand{\textlighthouse}{Light\-house}
+  \newcommand{\textabbrtruenorth}{TN}
+  \newcommand{\textabbrmagneticnorth}{MN}
+  \newcommand{\textabbrcompassnorth}{CN}
+  \newcommand{\textmathbearing}{B}
+  \newcommand{\textmathbearingmagnetic}{B_m}
+  \newcommand{\textmathbearingcompass}{B_c}
+  \newcommand{\textmathdirection}{D}
+  \newcommand{\textmathmagneticvariation}{m}
+  \newcommand{\textmathdeviation}{d}
+  \newcommand{\textmathheading}{h}
+  \newcommand{\textmathheadingmagnetic}{h_m}
+  \newcommand{\textmathheadingcompass}{h_c}
+  \newcommand{\textmathcrosswind}{c}
+  \newcommand{\textmathtidal}{t}
+  \newcommand{\textmathcts}{c_{ts}}
+  \newcommand{\textmathcog}{c_{og}}
+}{
+  \newcommand{\textcourse}{Kurs}
+  \newcommand{\textbearing}{Bäring}
+  \newcommand{\textboatpointing}{Båten pekar hit}
+  \newcommand{\textboatpointingdescr}{Beskriver dit båten pekar}
+  \newcommand{\textboatonchart}{Så går båtens resa, att ritas in i sjökortet}
+  \newcommand{\texttripdescr}{Beskriver resan}
+  \newcommand{\textwind}{Vind}
+  \newcommand{\textlighthouse}{Fyr}
+  \newcommand{\textabbrtruenorth}{RN}
+  \newcommand{\textabbrmagneticnorth}{MN}
+  \newcommand{\textabbrcompassnorth}{KN}
+  \newcommand{\textmathbearing}{B}
+  \newcommand{\textmathbearingmagnetic}{B_m}
+  \newcommand{\textmathbearingcompass}{B_k}
+  \newcommand{\textmathdirection}{R}
+  \newcommand{\textmathmagneticvariation}{m}
+  \newcommand{\textmathdeviation}{d}
+  \newcommand{\textmathheading}{k}
+  \newcommand{\textmathheadingmagnetic}{k_m}
+  \newcommand{\textmathheadingcompass}{k_k}
+  \newcommand{\textmathcrosswind}{a}
+  \newcommand{\textmathtidal}{s}
+  \newcommand{\textmathcts}{k_{gv}}
+  \newcommand{\textmathcog}{k_{\ddot{o}g}}
+}
+
+\newcommand{\rotatedcenteredtext}[2]{\rotatebox[origin=c]{#1}{#2}}
+
+\newcommand{\drawboat}[3]{
+  \def\x{#1}
+  \def\y{#2}
+  \draw[black, fill=#3] (\x - 0.1, \y + 0.3) -- (\x + 0.2, \y) -- (\x + 0.2, \y - 0.2) -- (\x, \y - 0.2) -- (\x - 0.3, \y + 0.1) -- (\x - 0.1, \y + 0.3);
+}
+
+\newcommand{\drawlighthouse}[2]{
+  \def\x{#1}
+  \def\y{#2}
+  \draw[black, fill=black] (\x, \y + 0.3) -- (\x + 0.1, \y + 0.1) -- (\x + 0.3, \y + 0.1) -- (\x + 0.15, \y - 0.05) -- (\x + 0.2, \y - 0.25) -- (\x, \y - 0.12) -- (\x - 0.2, \y - 0.25) -- (\x - 0.15, \y - 0.05) -- (\x - 0.3, \y + 0.1) -- (\x - 0.1, \y + 0.1) -- (\x, \y + 0.3);
+  \draw[fill=white] (\x, \y) circle (0.1cm);
+  \draw[fill=black] (\x, \y) circle (0.1mm);
+}
+
+
+\begin{document}
+\begin{center}
+\Huge \textcourse{} \& \textbearing{}
+\end{center}
+
+  \begin{wrapfigure}{l}{0.5\textwidth}
+  \vspace{1.5cm}
+  \hspace{-0.5cm}
+  \begin{tikzpicture}
+    \coordinate (origo) at (0,0);
+
+    % Wind
+    \node[above] at (6, -4) {\fontsize{25}{22.4}\selectfont $\Leftarrow$};
+    \node[above] at (7, -3.9) {\textwind};
+
+    \draw[thick,gray] (origo) -- (90:7cm) node (tn) {};
+    \node[above, text width=0.7cm] at (tn) {\textabbrtruenorth};
+    \draw[thick,gray] (origo) -- (80:7cm) node (mn) {};
+    \node[above, text width=0.7cm] at (mn) {\textabbrmagneticnorth};
+    \draw[thick,gray] (origo) -- (70:7cm) node (cn) {};
+    \node[above, text width=0.7cm] at (cn) {\textabbrcompassnorth};
+
+
+    \draw[thick,gray,dashed] (origo) -- (-45:6.5cm)  node (course) {};
+    \node[below right, text width=2cm] at (course) {\textboatpointing};
+    \draw[thick,gray,dashed] (origo) -- (-110:6.5cm)  node (cts_line) {};
+    \node[below right, text width=2cm] at (cts_line) {};
+    \draw[thick,gray,dashed] (origo) -- (-130:6.5cm) node (cog_line) {};
+    \node[below, text width=3cm] at (cog_line) {\textboatonchart};
+
+    \draw[thick,gray,dashed] (origo) -- (-155:4.5cm) node (lh) {};
+
+
+    \pic [draw, Latex-, "$\textmathbearing{}$",         above, angle eccentricity=0.8,  angle radius=0.7cm]  {angle = lh--origo--tn};
+    \pic [draw, Latex-, "$\textmathbearingmagnetic{}$", above, angle eccentricity=0.89, angle radius=1.4cm]  {angle = lh--origo--mn};
+    \pic [draw, Latex-, "$\textmathbearingcompass{}$",  above, angle eccentricity=0.96, angle radius=2.1cm]  {angle = lh--origo--cn};
+
+    \pic [draw, Latex-, "$\textmathdirection$",         right, angle eccentricity=1.1,  angle radius=2.45cm] {angle = lh--origo--course};
+
+    \pic [draw, Latex-, "$\textmathmagneticvariation$",        angle eccentricity=1.05, angle radius=4.2cm]  {angle = mn--origo--tn};
+    \pic [draw, Latex-, "$\textmathdeviation$",                angle eccentricity=1.05, angle radius=4.5cm]  {angle = cn--origo--mn};
+
+    \pic [draw, Latex-, "$\textmathheading$",                  angle eccentricity=0.91, angle radius=2.8cm]  {angle = course--origo--tn};
+    \pic [draw, Latex-, "$\textmathheadingmagnetic$",          angle eccentricity=0.92, angle radius=3.5cm]  {angle = course--origo--mn};
+    \pic [draw, Latex-, "$\textmathheadingcompass$",           angle eccentricity=0.95, angle radius=4.2cm]  {angle = course--origo--cn};
+
+    \pic [draw, Latex-, "$\textmathcrosswind$",                angle eccentricity=1.1,  angle radius=3.2cm]  {angle = cts_line--origo--course};
+    \pic [draw, Latex-, "$\textmathtidal$",                    angle eccentricity=1.1,  angle radius=2.9cm]  {angle = cog_line--origo--cts_line};
+
+    \pic [draw, Latex-, "$\textmathcts$",                      angle eccentricity=0.94, angle radius=4.9cm]  {angle = cts_line--origo--cn};
+    \pic [draw, Latex-, "$\textmathcog$",                      angle eccentricity=0.95, angle radius=5.6cm]  {angle = cog_line--origo--tn};
+
+    \draw[gray,dotted] (-1.2, -3.5) -- (-0.2, -4.5)  node (course_cts) {};
+    \draw[gray,dotted] (-2.6, -3.2) -- (-1.6, -4.2)  node (course_cog) {};
+    \drawboat{-1.2}{-3.5}{lightgray}
+    \drawboat{-2.6}{-3.2}{lightgray}
+    \drawboat{0}{0}{darkgray}
+
+    \drawlighthouse{-4}{-1.88}
+    \node[left, xshift=-0.7em, text width=1cm] at (lh) {\textlighthouse};
+  \end{tikzpicture}
+\end{wrapfigure}
+%
+%
+%
+\begin{equation*}
+  \hspace{3.5cm}
+  \begin{array}{p{1.1cm} l r r}
+      \multicolumn{4}{c}{\textrm{\textbf{\textcourse}}}\\
+      \ldelim\{{5}{20pt}[\rotatedcenteredtext{90}{\parbox{2.4cm}{\centering\textboatpointingdescr}}]
+      &   & \textmathheadingcompass{}    &\\
+      & + & \textmathdeviation{}         &\\
+      \cline{2-3}
+      &   & \textmathheadingmagnetic{}   &\\
+      & + & \textmathmagneticvariation{} &\\
+      \cline{2-3}
+      &   & \textmathheading{}           & \rdelim\}{5}{20pt}[\rotatedcenteredtext{270}{\parbox{2.4cm}{\centering\texttripdescr{}}}]\\
+      & + & \textmathcrosswind{}         &\\
+      \cline{2-3}
+      &   & \textmathcts{}               &\\
+      & + & \textmathtidal{}             &\\
+      \cline{2-3}
+      &   & \textmathcog{}               &\\
+      \\
+      \\
+      \\
+      \multicolumn{4}{c}{\textrm{\textbf{\textbearing}}}\\
+      &   & \textmathbearingcompass{}    &\\
+      & + & \textmathdeviation{}         &\\
+      \cline{2-3}
+      &   & \textmathbearingmagnetic{}   &\\
+      & + & \textmathmagneticvariation{} &\\
+      \cline{2-3}
+      &   & \textmathbearing{}           &\\
+  \end{array}
+\end{equation*}
+
+
+\ifthenelse{ \equal{\useenglish}{true}}{
+  \clearpage
+  \noindent
+  \begin{tabular}{p{0.05\textwidth} p{0.9\textwidth}}
+    \textabbrtruenorth           & \textbf{True north:} The Earth's geographic north pole. Is a meridian line.\\
+    \textabbrmagneticnorth       & \textbf{Magnetic north:} The Earth's magnetic north pole.\\
+    \textabbrcompassnorth        & \textbf{Compass north:} North according to the compass. Iron near the compass may make it deviate from the magnetic north pole. The boat's keel, engine, etc. are usual causes.\\
+                                 & \\
+    $\textmathmagneticvariation$ & \textbf{Magnetic variation:} How much the magnetic north deviates from the geographic north. Varies with place and time. Can be read from the nautical chart.\\
+    $\textmathdeviation$         & \textbf{Deviation:} How much the compass deviates from the magnetic north. Varies with boats, cargo and heading.\\
+    $\textmathheading$           & \textbf{Heading:} The angle between the direction in which the boat is pointing and the meridian.\\
+    $\textmathheadingmagnetic$   & \textbf{Heading, magnetic:} The angle between the magnetic north and the heading.\\
+    $\textmathheadingcompass$    & \textbf{Heading, compass:} The angle between the compass north and the heading.\\
+                                 & \\
+    $\textmathcrosswind$         & \textbf{Crosswind:} The effect of the wind.\\
+    $\textmathtidal$             & \textbf{Tidal:} How much the current influences.\\
+    $\textmathcts$               & \textbf{Course to steer:} The line through the water that the boat should steer, bearing in mind the wind and tide.\\
+    $\textmathcog$               & \textbf{Course over ground:} What the nautical chart shows.\\
+                                 & \\
+    $\textmathbearing$           & \textbf{Bearing:} The angle away from North of a distant point as observed at the current point.\\
+    $\textmathbearingmagnetic$   & \textbf{Magnetic bearing:} The angle from a distant point from the magnetic north.\\
+    $\textmathbearingcompass$    & \textbf{Compass bearing:} The angle from a distant point from the compass north.\\
+    $\textmathdirection$         & \textbf{Direction:} The angle from a distant point from where the boat is pointing.\\
+  \end{tabular}
+  %https://en.wikipedia.org/wiki/Course_(navigation)
+}{
+  \clearpage
+  \noindent
+  \begin{tabular}{p{0.05\textwidth} p{0.9\textwidth}}
+    \textabbrtruenorth           & \textbf{Rättvisande norr, eller riktiga norr:} Jordens geografiska nordpol. Är en meridianlinje.\\
+    \textabbrmagneticnorth       & \textbf{Magnetiska norr:} Jordens magnetiska nordpol.\\
+    \textabbrcompassnorth        & \textbf{Kompassens norr:} Norr enligt kompassen. Järn i närheten av kompassen kan få den att deviera från den magnetiska nordpolen. Båtens köl, motor mm. är vanliga orsaker.\\
+                                 & \\
+    $\textmathmagneticvariation$ & \textbf{Missvisning:} Så mycket som magnetiska norr avviker från det geo\-grafiska norr. Plats- och tidsberoende. Avläses från sjökortet.\\
+    $\textmathdeviation$         & \textbf{Deviation:} Så mycket som kompassen avviker från magnetiska norr. Båt-, last- och kursberoende.\\
+    $\textmathheading$           & \textbf{Kurs:} Långskeppslinjens vinkel till meridianen.\\
+    $\textmathheadingmagnetic$   & \textbf{Kurs, magnetisk:} Vinkeln mellan magnetisk nord och styrd kurs.\\
+    $\textmathheadingcompass$    & \textbf{Kurs, kompass:} Vinkeln mellan kompassnord och styrd kurs.\\
+                                 & \\
+    $\textmathcrosswind$         & \textbf{Avdrift:} Vindens påverkan. Man måste kompensera sin kurs för avdriften för att hamna rätt.\\
+    $\textmathtidal$             & \textbf{Strömmens sättning:} Hur mycket strömmen påverkar. Man måste kompensera sin kurs för sättningen för att hamna rätt.\\
+    $\textmathcts$               & \textbf{Kurs genom vatten:} Den kurslinje genom vattnet som båten glider utefter.\\
+    $\textmathcog$               & \textbf{Kurs över grund:} Det som sjökortet visar.\\
+                                 & \\
+    $\textmathbearing$           & \textbf{Bäring:} Avståndet till ett föremåls syftlinje, från jordens geografiska nordpol.\\
+    $\textmathbearingmagnetic$   & \textbf{Magnetisk bäring:} Avståndet till ett föremål från magnetiska norr.\\
+    $\textmathbearingcompass$    & \textbf{Kompassens bäring:} Avståndet till ett föremål från kompassens norr.\\
+    $\textmathdirection$         & \textbf{Riktning:} Avståndet till ett föremål från dit båten pekar.\\
+  \end{tabular}
+}
+
+\end{document}
